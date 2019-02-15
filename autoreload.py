@@ -24,7 +24,7 @@ __all__ = [
     "run_with_reloader",
 ]
 
-import os,sys,time,subprocess,thread,signal
+import os,sys,time,subprocess,_thread,signal
 
 def _iter_module_files():
     """Iterator to module's source filename of sys.modules (built-in 
@@ -96,7 +96,7 @@ def _ridrect_stdout(stdout):
     while 1:
         data = os.read(stdout.fileno(), 2**15)
         if len(data) > 0:
-            sys.stdout.write(data)
+            sys.stdout.write(data.decode('utf-8'))
         else:
             stdout.close()
             sys.stdout.flush()
@@ -111,7 +111,7 @@ def run_with_reloader(runner, *args, **kwargs):
         kwargs: arguments for runner.
     """
     if os.environ.get('RUN_FLAG') == 'true':
-        thread.start_new_thread(runner, args, kwargs)
+        _thread.start_new_thread(runner, args, kwargs)
         try:
             _start_change_detector()
         except KeyboardInterrupt:
